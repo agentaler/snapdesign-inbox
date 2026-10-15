@@ -1,6 +1,11 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "snapdesign-inbox",
+	"workers_dev": false,
+	"preview_urls": false,
+	"routes": [
+		{ "pattern": "mail.snapdesign.ai", "custom_domain": true }
+	],
 	"compatibility_date": "2025-11-28",
 	"main": "./workers/app.ts",
 	"observability": {

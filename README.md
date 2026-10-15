@@ -9,9 +9,9 @@ This is the studio's email client. It does not enable automatic customer notific
 - Worker: `snapdesign-inbox`
 - Mail domain: `snapdesign.ai`
 - Production R2 bucket: `snapdesign-inbox` (private)
-- Preview R2 bucket: `snapdesign-inbox-preview` (separate, private)
+- Preview R2 bucket: `snapdesign-inbox-preview` (configured name, not provisioned; preview builds disabled)
 - Durable Objects: mailbox storage, email agent, and MCP, scoped to this Worker
-- Planned web address: `mail.snapdesign.ai`
+- Web address: [mail.snapdesign.ai](https://mail.snapdesign.ai)
 
 No mail, passwords, sessions, 2FA enrollments, or other storage from the original deployment are copied.
 
@@ -38,20 +38,19 @@ The auth tests use synthetic credentials and in-memory storage; they are not pro
 
 ## Deploy to Cloudflare
 
-Commit and push this repository before deploying. Use the new repository's `main` branch for Cloudflare Workers Builds. Build command: `npm run build`; deploy command: `npx wrangler deploy`.
+Commit and push this repository before deploying. Cloudflare Workers Builds is connected to this repository's `main` branch. Build command: `npm run typecheck && npm test && npm run build`; deploy command: `npx wrangler deploy`. The custom domain is tracked in Wrangler; workers.dev and preview URLs are disabled. See the deployment record for remaining owner setup.
 
-For an authorized CLI deployment from the same committed source:
+If provisioning a fresh environment with authorized CLI access, create the bucket only once (the current production bucket already exists):
 
 ```sh
 npx wrangler login
 npx wrangler r2 bucket create snapdesign-inbox
-npx wrangler r2 bucket create snapdesign-inbox-preview
 npm run deploy
 npx wrangler secret put ADMIN_PASSWORD
 npx wrangler secret put SESSION_SECRET
 ```
 
-Enter secret values interactively or in Cloudflare's private Worker settings. Never commit them or copy the other project's credentials. The initial deployment is closed to private data until an admin sign-in is configured. Add `mail.snapdesign.ai` as a Worker custom domain; keep the existing apex website and `app.snapdesign.ai` on their current hosting.
+Enter secret values interactively or in Cloudflare's private Worker settings. Never commit them or copy the other project's credentials. The initial deployment is closed to private data until an admin sign-in is configured. Keep the existing apex website and `app.snapdesign.ai` on their current hosting. Provision the separate preview bucket before enabling any preview builds.
 
 Follow [DEPLOYMENT.md](DEPLOYMENT.md) for DNS, mailbox creation, mail verification, and current evidence. Do not route production mail until intended mailboxes exist: the inherited receiver ignores addresses without a stored mailbox.
 

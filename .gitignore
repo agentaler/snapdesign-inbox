@@ -19,3 +19,4 @@ skills-lock.json
 worker-configuration.d.ts
 
 .test-build/
+evidence/*.png

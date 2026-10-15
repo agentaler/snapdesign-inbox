@@ -1,0 +1,79 @@
+{
+  "checkedAt": "2026-10-15T06:36:45.968Z",
+  "origin": "https://mail.snapdesign.ai",
+  "results": [
+    {
+      "path": "/",
+      "status": 302,
+      "location": "/login",
+      "contentType": null,
+      "cacheControl": null,
+      "frame": "DENY",
+      "body": ""
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "location": null,
+      "contentType": "text/html",
+      "cacheControl": "no-store",
+      "frame": "DENY",
+      "body": "Login page rendered"
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "status": 401,
+      "location": null,
+      "contentType": "application/json",
+      "cacheControl": "no-store",
+      "frame": "DENY",
+      "body": "{\"error\":\"Not signed in\"}"
+    },
+    {
+      "path": "/api/v1/mailboxes",
+      "status": 401,
+      "location": null,
+      "contentType": "application/json",
+      "cacheControl": "no-store",
+      "frame": "DENY",
+      "body": "{\"error\":\"Not signed in\"}"
+    },
+    {
+      "path": "/api/v1/config",
+      "status": 401,
+      "location": null,
+      "contentType": "application/json",
+      "cacheControl": "no-store",
+      "frame": "DENY",
+      "body": "{\"error\":\"Not signed in\"}"
+    },
+    {
+      "path": "/mcp",
+      "status": 401,
+      "location": null,
+      "contentType": "application/json",
+      "cacheControl": null,
+      "frame": "DENY",
+      "body": "{\"error\":\"Unauthorized\"}"
+    },
+    {
+      "path": "/agents/email-agent/probe",
+      "status": 401,
+      "location": null,
+      "contentType": "text/plain; charset=UTF-8",
+      "cacheControl": null,
+      "frame": "DENY",
+      "body": "Not signed in"
+    },
+    {
+      "path": "/api/v1/mailboxes/probe/emails/test/attachments/test",
+      "status": 401,
+      "body": "{\"error\":\"Not signed in\"}"
+    },
+    {
+      "path": "/api/v1/mailboxes/probe/emails",
+      "status": 401,
+      "body": "{\"error\":\"Not signed in\"}"
+    }
+  ]
+}
