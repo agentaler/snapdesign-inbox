@@ -1,0 +1,28 @@
+SnapDesign Inbox verification record — 15 October 2026 (Asia/Ho_Chi_Minh)
+
+Repository: https://github.com/agentaler/snapdesign-inbox
+Web UI: https://mail.snapdesign.ai
+Source commit: 5ee47a8eb1b2cd3e044e63886162dff709f414dc
+Cloudflare build: 41095807-d680-405c-9fe4-5fa09936a8e3
+Code deployment version: 28e42105-747e-47b1-8ac7-d6901e1a6070
+Build and deployment succeeded at 2026-10-15 13:41:04 UTC+7.
+Owner secret changes can create a later runtime configuration version.
+
+Verified:
+- Cloudflare build explicitly links the source commit above.
+- Build gates: typecheck, seven auth tests, production bundle.
+- Private independent R2 bucket and Worker-scoped Durable Objects.
+- HTTPS /login returns 200; anonymous mailbox API returns 401.
+- workers.dev endpoint returns 404 after disabling it in source.
+- Owner completed admin secret entry and admin sign-in.
+- hello@snapdesign.ai created with display name SnapDesign; mailbox UI loads.
+- Receiving DNS activated. Public MX priorities: route3=11, route1=72, route2=89.
+- Apex SPF: v=spf1 include:_spf.mx.cloudflare.net ~all
+- Existing sending DNS and website records preserved.
+
+Pending:
+- Save prepared hello@snapdesign.ai -> snapdesign-inbox rule after browser-required access confirmation; catch-all remains disabled.
+- Owner-set mailbox password and admin authenticator enrollment; live 2FA login check.
+- Exact external test recipient and end-to-end send/reply receipt plus authentication-header checks.
+
+No customer email, payment, plan upgrade, credential migration, or automatic portal notification integration performed.
