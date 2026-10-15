@@ -1,0 +1,12 @@
+{
+  "test": "SNAP-INBOX-20261015-A",
+  "direction": "hello to bella",
+  "headers": {
+    "authentication-results": "mx.cloudflare.net; dkim=pass header.d=snapdesign.ai header.s=cf-bounce header.b=J+tZEUir; dkim=pass header.d=cloudflare-smtp.net header.s=cf2024-1 header.b=EytvgYaT; dmarc=pass header.from=snapdesign.ai policy.dmarc=reject; spf=none (mx.cloudflare.net: no SPF records found for postmaster@bg-hi.cloudflare-smtp.net) smtp.helo=bg-hi.cloudflare-smtp.net; spf=pass (mx.cloudflare.net: domain of b1auifue6kmqtr5itjegaper3rrcf2kai2bp4qo5fizw3wlcpa4a@cf-bounce.snapdesign.ai designates 104.30.16.78 as permitted sender) smtp.mailfrom=b1auifue6kmqtr5itjegaper3rrcf2kai2bp4qo5fizw3wlcpa4a@cf-bounce.snapdesign.ai; arc=none smtp.remote-ip=104.30.16.78",
+    "from": "SnapDesign <hello@snapdesign.ai>",
+    "to": "bella@snapdesign.ai",
+    "date": "Thu, 15 Oct 2026 07:10:22 +0000",
+    "message-id": "<iVpFwb2QKNGgdY5BMvLRhfCcYS5vz5KN3DIG@snapdesign.ai>"
+  },
+  "scope": "Same-domain SMTP delivery through Cloudflare; external inbox placement not tested"
+}

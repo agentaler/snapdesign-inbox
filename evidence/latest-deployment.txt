@@ -2,11 +2,12 @@ SnapDesign Inbox verification record — 15 October 2026 (Asia/Ho_Chi_Minh)
 
 Repository: https://github.com/agentaler/snapdesign-inbox
 Web UI: https://mail.snapdesign.ai
-Source commit: 5ee47a8eb1b2cd3e044e63886162dff709f414dc
-Cloudflare build: 41095807-d680-405c-9fe4-5fa09936a8e3
-Code deployment version: 28e42105-747e-47b1-8ac7-d6901e1a6070
-Build and deployment succeeded at 2026-10-15 13:41:04 UTC+7.
-Owner secret changes can create a later runtime configuration version.
+Observed source commit: 54187b8825e3e23298240b3f4f8c6eb4cf2089b4
+Cloudflare build: d5ff02c3-035b-49c5-94c1-2f90eafa8029
+Worker version: f69ae83f-7c07-41c4-bb7a-d75666290a5a
+Build and deployment succeeded at 2026-10-15 13:55:19 UTC+7.
+This records the deployment observed before the mail tests; later documentation
+builds or owner secret changes can create newer runtime versions.
 
 Verified:
 - Cloudflare build explicitly links the source commit above.
@@ -15,14 +16,23 @@ Verified:
 - HTTPS /login returns 200; anonymous mailbox API returns 401.
 - workers.dev endpoint returns 404 after disabling it in source.
 - Owner completed admin secret entry and admin sign-in.
-- hello@snapdesign.ai created with display name SnapDesign; mailbox UI loads.
+- All five mailboxes created: hello, bella, sales, support, designer @snapdesign.ai.
+- Hello has a separate password set; admin can open the created mailbox UIs.
 - Receiving DNS activated. Public MX priorities: route3=11, route1=72, route2=89.
 - Apex SPF: v=spf1 include:_spf.mx.cloudflare.net ~all
 - Existing sending DNS and website records preserved.
+- Owner-configured catch-all is Active and targets Worker snapdesign-inbox.
+- At 14:10 UTC+7, Hello -> Bella setup test appeared in Bella Inbox.
+- Received headers: envelope SPF pass, snapdesign.ai DKIM pass, DMARC pass.
+- At 14:12 UTC+7, Bella -> Hello reply appeared in Hello Inbox with test reference.
+- Test reference: SNAP-INBOX-20261015-A. Actual received bodies were inspected.
+- Inbound mail automatically produced an AI draft; generated drafts were not sent.
 
 Pending:
-- Save prepared hello@snapdesign.ai -> snapdesign-inbox rule after browser-required access confirmation; catch-all remains disabled.
-- Owner-set mailbox password and admin authenticator enrollment; live 2FA login check.
-- Exact external test recipient and end-to-end send/reply receipt plus authentication-header checks.
+- Owner submission of generated passwords for Bella, Sales, Support, Designer.
+  At last inspection these four displayed No password. Passwords are outside Git.
+- Admin authenticator enrollment: last UI inspection showed Off; live 2FA login untested.
+- Individual mailbox-user login tests and external-provider send/reply tests.
+  No external test recipient was supplied. Same-domain delivery is verified only.
 
 No customer email, payment, plan upgrade, credential migration, or automatic portal notification integration performed.
