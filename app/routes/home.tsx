@@ -27,7 +27,7 @@ import { signOut, useSession } from "~/queries/session";
 import TwoFactorCard from "~/components/TwoFactorCard";
 
 export function meta() {
-	return [{ title: "Agentic Inbox" }];
+	return [{ title: "SnapDesign Inbox" }];
 }
 
 export default function HomeRoute() {

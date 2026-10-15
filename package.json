@@ -1,10 +1,10 @@
 {
-	"name": "agentic-inbox",
+	"name": "snapdesign-inbox",
 	"private": true,
 	"license": "Apache-2.0",
 	"type": "module",
 	"cloudflare": {
-		"label": "Agentic Inbox",
+		"label": "SnapDesign Inbox",
 		"products": [
 			"Workers",
 			"Durable Objects",
@@ -23,7 +23,8 @@
 		"deploy": "npm run build && wrangler deploy",
 		"dev": "react-router dev",
 		"preview": "npm run build && vite preview",
-		"typecheck": "npm run cf-typegen && react-router typegen && tsc -b"
+		"typecheck": "npm run cf-typegen && react-router typegen && tsc -b",
+		"test": "node scripts/test.mjs"
 	},
 	"dependencies": {
 		"@cloudflare/ai-chat": "^0.1.8",
@@ -99,6 +100,7 @@
 		"typescript": "^5.8.3",
 		"vite": "^6.3.3",
 		"vite-tsconfig-paths": "^5.1.4",
-		"wrangler": "^4.74.0"
+		"wrangler": "^4.74.0",
+		"esbuild": "0.25.12"
 	}
 }

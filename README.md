@@ -1,113 +1,64 @@
-<div align="center">
-  <h1>Agentic Inbox</h1>
-  <p><em>A self-hosted email client with an AI agent, running entirely on Cloudflare Workers</em></p>
-</div>
+# SnapDesign Inbox
 
-Agentic Inbox lets you send, receive, and manage emails through a modern web interface -- all powered by your own Cloudflare account. Incoming emails arrive via [Cloudflare Email Routing](https://developers.cloudflare.com/email-routing/), each mailbox is isolated in its own [Durable Object](https://developers.cloudflare.com/durable-objects/) with a SQLite database, and attachments are stored in [R2](https://developers.cloudflare.com/r2/).
+A separate deployment of [agentaler/agentic-inbox](https://github.com/agentaler/agentic-inbox) for `snapdesign.ai`, preserving its custom mailbox sign-in and authenticator-app two-step verification. Upstream source: `02d0a8804717f909618bea8619d3c4e624405d8b`. Originally built by [Cloudflare](https://github.com/cloudflare/agentic-inbox); Apache-2.0 license and source notices are retained.
 
-An **AI-powered Email Agent** can read your inbox, search conversations, and draft replies -- built with the [Cloudflare Agents SDK](https://developers.cloudflare.com/agents/) and [Workers AI](https://developers.cloudflare.com/workers-ai/).
+This is the studio's email client. It does not enable automatic customer notifications in the SnapDesign portal.
 
-![Agentic Inbox screenshot](./demo_app.png)
+## Configuration
 
+- Worker: `snapdesign-inbox`
+- Mail domain: `snapdesign.ai`
+- Production R2 bucket: `snapdesign-inbox` (private)
+- Preview R2 bucket: `snapdesign-inbox-preview` (separate, private)
+- Durable Objects: mailbox storage, email agent, and MCP, scoped to this Worker
+- Planned web address: `mail.snapdesign.ai`
 
-Read the blog post to learn more about Cloudflare Email Service and how to use it with the Agents SDK, MCP, and from the Wrangler CLI: [Email for Agents](https://blog.cloudflare.com/email-for-agents/).
+No mail, passwords, sessions, 2FA enrollments, or other storage from the original deployment are copied.
 
-## How to setup
+## Sign-in
 
-**Important**: Clicking the 'Deploy to Cloudflare' button is only one part of the setup. You must follow the **After deploying** steps as well. For a full step-by-step guide with screenshots, refer to this comment: 
-https://github.com/cloudflare/agentic-inbox/issues/4#issuecomment-4269118513
+The login page is `/login`. Each mailbox signs in with its address and password, and server-side checks restrict it to its own mailbox. The `admin` login uses the private `ADMIN_PASSWORD` Worker secret and can manage all mailboxes. With that secret absent, admin password login is disabled.
 
-### To set up
+Two-step verification is supported for mailbox and admin password logins. Each person must enroll their own authenticator and confirm a code; installing the code alone does not enable 2FA. Keep admin credentials in a password manager. Mailbox passwords are hashed; the server stores TOTP secrets privately to verify codes.
 
-1. Deploy to Cloudflare. The deploy flow will automatically provision R2, Durable Objects, and Workers AI. You'll be prompted for **DOMAINS**, which is the domain (yourdomain.com) you want to receive emails for (email@yourdomain.com).
+Set an independent `SESSION_SECRET` of at least 32 characters as a Worker secret. The source otherwise generates a key in private R2. Optional `POLICY_AUD` and `TEAM_DOMAIN` allow a verified Cloudflare Access JWT to act as admin. They are unnecessary for custom sign-in and must not be copied from the other project's Access application. Optional `MCP_TOKEN` grants admin-level MCP access; leave unset unless explicitly needed.
 
-     [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/agentic-inbox)
+## Build and check
 
-2. **Configure Cloudflare Access** -- Enable [one-click Cloudflare Access](https://developers.cloudflare.com/changelog/post/2025-10-03-one-click-access-for-workers/) on your Worker under Settings > Domains & Routes. The modal will show your `POLICY_AUD` and `TEAM_DOMAIN` values. `TEAM_DOMAIN` can be either your Access team URL or the full `.../cdn-cgi/access/certs` URL. **You must set these as secrets for your Worker.**
-3. **Set up Email Routing** -- In the Cloudflare dashboard, go to your domain > Email Routing and create a catch-all rule that forwards to this Worker
-4. **Enable Email Service** -- The worker needs the `send_email` binding to send outbound emails. See [Email Service docs](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/)
-5. **Create a mailbox** -- Visit your deployed app and create a mailbox for any address on your domain (e.g. `hello@example.com`)
+Use Node.js 22 or newer and npm. Dependencies are pinned by `package-lock.json`.
 
-### Troubleshooting Access
-
-1. If you see `Invalid or expired Access token`, that usually means `POLICY_AUD` or `TEAM_DOMAIN` secrets are incorrect.
-   * Resolution: [turn Access off and back on for the Worker to get the Access modal again](https://developers.cloudflare.com/changelog/post/2025-10-03-one-click-access-for-workers/), then reset your Worker secrets to the latest `POLICY_AUD` and `TEAM_DOMAIN` values shown there.
-2. If you see `Cloudflare Access must be configured in production`, this application is intentionally enforcing Cloudflare Access so your inbox is not exposed to anyone on the internet.
-   * Resolution: enable Access using [one-click Cloudflare Access for Workers](https://developers.cloudflare.com/changelog/post/2025-10-03-one-click-access-for-workers/), then set the `POLICY_AUD` and `TEAM_DOMAIN` Worker secrets from the modal values.
-
-## Sign-in (this fork)
-
-This fork replaces the Cloudflare Access gate with its own sign-in page, so colleagues don't need a Cloudflare account.
-
-- Everyone signs in at `/login` with their **mailbox address and password**, and can only open that mailbox (API, agent and pages are all checked server-side).
-- The **admin** signs in with the login `admin` and the password in the `ADMIN_PASSWORD` Worker secret. Admins see every mailbox, create mailboxes and set passwords (key icon on the Mailboxes page). Changing a password signs that mailbox out everywhere.
-- A request carrying a valid Cloudflare Access JWT (`POLICY_AUD` + `TEAM_DOMAIN`) is also treated as admin, so you can keep Access on an admin-only hostname or path if you like.
-- Each mailbox can **forward a copy** of incoming mail (Settings → Forward a copy). The address must be a verified destination in Email Routing.
-- Optional secrets: `SESSION_SECRET` (32+ chars; otherwise a random key is generated and kept in R2) and `MCP_TOKEN` (lets MCP clients use `/mcp` with `Authorization: Bearer <token>`; otherwise MCP is admin-only).
-- Login attempts are rate limited (10/min per IP and per address) with the `LOGIN_LIMITER` binding, and an address is locked for 15 minutes after 8 failed attempts.
-- **Two-step verification**: anyone (including admin) can turn on authenticator-app codes in Settings / on the Mailboxes page. Admins can turn it off for a mailbox when resetting its password (lost phone).
-- Passwords must be 10+ characters, can't contain the address, and are checked against known data breaches (Have I Been Pwned, k-anonymity).
-- Remote images in emails are blocked until the reader clicks "Show images" (no tracking pixels); inline images still show.
-- Security headers on every response (CSP, `frame-ancestors 'none'`, HSTS, `nosniff`, `no-referrer`), and API responses are `no-store`.
-
-## Features
-
-- **Full email client** — Send and receive emails via Cloudflare Email Routing with a rich text composer, reply/forward threading, folder organization, search, and attachments
-- **Per-mailbox isolation** — Each mailbox runs in its own Durable Object with SQLite storage and R2 for attachments
-- **Built-in AI agent** — Side panel with 9 email tools for reading, searching, drafting, and sending
-- **Auto-draft on new email** — Agent automatically reads inbound emails and generates draft replies, always requiring explicit confirmation before sending
-- **Configurable and persistent** — Custom system prompts per mailbox, persistent chat history, streaming markdown responses, and tool call visibility
-
-## Stack
-
-- **Frontend:** React 19, React Router v7, Tailwind CSS, Zustand, TipTap, `@cloudflare/kumo`
-- **Backend:** Hono, Cloudflare Workers, Durable Objects (SQLite), R2, Email Routing
-- **AI Agent:** Cloudflare Agents SDK (`AIChatAgent`), AI SDK v6, Workers AI (`@cf/moonshotai/kimi-k2.5`), `react-markdown` + `remark-gfm`
-- **Auth:** Cloudflare Access JWT validation (required outside local development)
-
-## Getting Started
-
-```bash
-npm install
-npm run dev
+```sh
+npm ci
+npm run typecheck
+npm test
+npm run build
 ```
 
-### Configuration
+The auth tests use synthetic credentials and in-memory storage; they are not proof of a configured Cloudflare account or a full production security audit. No upstream lint or browser-test command exists.
 
-1. Set your domain in `wrangler.jsonc`
-2. Create an R2 bucket named `agentic-inbox`: `wrangler r2 bucket create agentic-inbox`
+## Deploy to Cloudflare
 
-### Deploy
+Commit and push this repository before deploying. Use the new repository's `main` branch for Cloudflare Workers Builds. Build command: `npm run build`; deploy command: `npx wrangler deploy`.
 
-```bash
+For an authorized CLI deployment from the same committed source:
+
+```sh
+npx wrangler login
+npx wrangler r2 bucket create snapdesign-inbox
+npx wrangler r2 bucket create snapdesign-inbox-preview
 npm run deploy
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put SESSION_SECRET
 ```
 
-## Prerequisites
+Enter secret values interactively or in Cloudflare's private Worker settings. Never commit them or copy the other project's credentials. The initial deployment is closed to private data until an admin sign-in is configured. Add `mail.snapdesign.ai` as a Worker custom domain; keep the existing apex website and `app.snapdesign.ai` on their current hosting.
 
-- Cloudflare account with a domain
-- [Email Routing](https://developers.cloudflare.com/email-routing/) enabled for receiving
-- [Email Service](https://developers.cloudflare.com/email-service/) enabled for sending
-- [Workers AI](https://developers.cloudflare.com/workers-ai/) enabled (for the agent)
-- [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) configured for deployed/shared environments (required in production)
+Follow [DEPLOYMENT.md](DEPLOYMENT.md) for DNS, mailbox creation, mail verification, and current evidence. Do not route production mail until intended mailboxes exist: the inherited receiver ignores addresses without a stored mailbox.
 
-Any user who passes the shared Cloudflare Access policy can access all mailboxes in this app by design. This includes the MCP server at `/mcp` -- external AI tools (Claude Code, Cursor, etc.) connected via MCP can operate on any mailbox by passing a `mailboxId` parameter. There is no per-mailbox authorization; the Cloudflare Access policy is the single trust boundary.
+## Receiving and sending
 
-## Architecture
+Cloudflare Email Routing delivers incoming mail to this Worker's `email()` handler. Create intended mailboxes first, then add Email Routing rules for those addresses (or deliberately choose catch-all routing), and activate the domain's required MX/TXT records.
 
-```
-┌──────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Browser    │────>│  Hono Worker     │────>│  MailboxDO      │
-│  React SPA   │     │  (API + SSR)     │     │  (SQLite + R2)  │
-│  Agent Panel │     │                  │     └─────────────────┘
-└──────┬───────┘     │  /agents/* ──────┼────>┌─────────────────┐
-       │             │                  │     │  EmailAgent DO  │
-       │ WebSocket   │                  │     │  (AIChatAgent)  │
-       └─────────────┤                  │     │  9 email tools  │
-                     │                  │────>│  Workers AI     │
-                     └──────────────────┘     └─────────────────┘
-```
+Outbound mail uses the `EMAIL` send binding. [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/) must be available for the account, with the sending domain verified. General outbound sending requires Workers Paid; routing alone is not proof that arbitrary-recipient sending is enabled. Do not buy a plan or accept new terms without the owner.
 
-## License
-
-Apache 2.0 -- see [LICENSE](LICENSE).
+The inherited AI agent can read mail, draft replies, and send after confirmation; inbound mail triggers its auto-draft path. Review that behavior before routing confidential customer mail. Forward-copy destinations must be verified in Cloudflare. There is no automatic email integration with the SnapDesign portal.

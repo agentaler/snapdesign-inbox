@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router";
 import api, { ApiError } from "~/services/api";
 
 export function meta() {
-	return [{ title: "Sign in · Agentic Inbox" }];
+	return [{ title: "Sign in · SnapDesign Inbox" }];
 }
 
 /** Only allow redirects to paths on this site. */
@@ -86,7 +86,7 @@ export default function LoginRoute() {
 						autoComplete="username"
 						autoCapitalize="none"
 						spellCheck={false}
-						placeholder="you@company.com"
+						placeholder="you@snapdesign.ai"
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						autoFocus

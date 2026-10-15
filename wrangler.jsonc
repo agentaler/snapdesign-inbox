@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "agentic-inbox",
+	"name": "snapdesign-inbox",
 	"compatibility_date": "2025-11-28",
 	"main": "./workers/app.ts",
 	"observability": {
@@ -13,14 +13,14 @@
 		// Sign-in: each mailbox has its own password (set by an admin on the Mailboxes page).
 		// Secrets: ADMIN_PASSWORD enables the "admin" login. Optional: SESSION_SECRET, MCP_TOKEN,
 		// and POLICY_AUD + TEAM_DOMAIN (a valid Cloudflare Access JWT then signs you in as admin).
-		"DOMAINS": "humanedge.asia",
+		"DOMAINS": "snapdesign.ai",
 		"EMAIL_ADDRESSES": []
 	},
 	"ratelimits": [
 		{
 			// Login attempts: 10 per minute per IP and per address.
 			"name": "LOGIN_LIMITER",
-			"namespace_id": "3001",
+			"namespace_id": "3002",
 			"simple": {
 				"limit": 10,
 				"period": 60
@@ -36,8 +36,8 @@
 	"r2_buckets": [
 		{
 			"binding": "BUCKET",
-			"bucket_name": "agentic-inbox",
-			"preview_bucket_name": "agentic-inbox"
+			"bucket_name": "snapdesign-inbox",
+			"preview_bucket_name": "snapdesign-inbox-preview"
 		}
 	],
 	"ai": {
